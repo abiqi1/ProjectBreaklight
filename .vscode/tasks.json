@@ -7,7 +7,10 @@
     "args": ["/C"],
     "tasks": [
         {
-            "group": "build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "label": "make",
             "command": "${env:GDK}\\bin\\make",
             "args": [

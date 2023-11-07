@@ -5,7 +5,10 @@
             "includePath": [
                 "${default}",
                 "${GDK}/inc",
-                "${GDK}/res"
+                "${GDK}/res",
+                "${workspaceFolder}/inc",
+                "${workspaceFolder}/res"
+
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
