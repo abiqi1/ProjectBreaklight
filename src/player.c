@@ -23,11 +23,11 @@ void PLAYER_handleInput(u16 value)
 {
     if(value & BUTTON_RIGHT)
     {
-        posX += 1;
+        posX += 3;
     }
     else if (value & BUTTON_LEFT)
     {
-        posX -= 1;
+        posX -= 3;
     }
 
     if(value & BUTTON_UP)
