@@ -1,0 +1,1 @@
+SPRITE player_car "sprites\ball.png" 1  1 NONE
