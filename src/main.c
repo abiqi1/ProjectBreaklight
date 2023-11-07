@@ -9,9 +9,7 @@ int main()
 	ind = TILE_USERINDEX;
 
 	SPR_init();
-	PLAYER_init(ind);
-	
-
+	ind += PLAYER_init(ind);
 	
 	while(TRUE)
 	{   
@@ -24,12 +22,8 @@ int main()
 	return (0);
 }
 
-
-
 static void handleInput()
 {
-
 	u16 value = JOY_readJoypad(JOY_1);
 	PLAYER_handleInput(value);
-
 }
