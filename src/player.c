@@ -10,7 +10,6 @@ Sprite* player;
 
 u16 PLAYER_init(u16 vramIndex)
 {   
-
     posX = 200;
     posY = 100;
 
@@ -22,7 +21,6 @@ u16 PLAYER_init(u16 vramIndex)
 
 void PLAYER_handleInput(u16 value)
 {
-
     if(value & BUTTON_RIGHT)
     {
         posX += 1;
@@ -42,5 +40,4 @@ void PLAYER_handleInput(u16 value)
     }
 
     SPR_setPosition(player, posX, posY);
-
 }
