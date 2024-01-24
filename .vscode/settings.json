@@ -3,7 +3,8 @@
         "genesis.h": "c",
         "font.h": "c",
         "vdp_tile.h": "c",
-        "resources.h": "c"
+        "resources.h": "c",
+        "level.h": "c"
     },
     "cmake.configureOnOpen": false
 }
