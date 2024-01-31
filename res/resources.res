@@ -1,7 +1,10 @@
-TILESET bga_tileset "sprites\road.png" BEST ALL
-#MAP bgb_map "sprites\road.png" bgb_tileset BEST
-IMAGE bga_road "sprites\road.png" BEST ALL
-PALETTE palette_all "sprites\road.png"
 
-SPRITE player_car "sprites\ball.png" 1  1 NONE
+
+IMAGE road "sprites\road.png" BEST ALL
+IMAGE water "sprites\water_a.png" BEST ALL
+
+PALETTE road_pal "sprites\road.png"
+PALETTE water_pal "sprites\water_a.png"
+
+SPRITE player_car "sprites\cars_sheet.png" 8  8 BEST 5
 

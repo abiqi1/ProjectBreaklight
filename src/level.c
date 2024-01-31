@@ -1,45 +1,181 @@
 #include "genesis.h"
 #include "level.h"
 #include "resources.h"
+#include "player.h"
 
 
-//Map* background;
+int bgbOffset = 0;
+int bgaOffset = 0;
+u16* levelSpeed;
+int waterSpeedDivide = 2;
+u16 bgBaseTileIndex[2];
+const u16 LEVEL_ARRAY_LENGTH = 40;
+//fix16* speed;
+//fix16 waterSpeedDivide = FIX16(0.25);
 
-//u32 dir = 0;
-int offset = 0;
-int* speed;
+const u8 LEVEL_COLLISION[1280] =
+{
+	0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0 
+};
+
 
 u16 LEVEL_init(u16 vramIndex)
 {
-    PAL_setPalette(PAL0, palette_all.data,DMA);
     u16 ind;
-    ind = TILE_USERINDEX;
-    VDP_loadTileSet(&bga_tileset, ind, DMA);
-    ind += bga_tileset.numTile;
+
+    PAL_setPalette(PAL0, water_pal.data, DMA);
+	PAL_setPalette(PAL1, road_pal.data, DMA);
+
+    //load tilesets to vram and keep index
+    ind = vramIndex;
+    bgBaseTileIndex[0] = ind;
+    VDP_loadTileSet(water.tileset, ind, DMA);
+    ind += water.tileset->numTile;
+    bgBaseTileIndex[1] = ind;
+    VDP_loadTileSet(road.tileset, ind, DMA);
+    ind += road.tileset->numTile;
     
+    // background = MAP_create(&bgb_map, BG_B, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USERINDEX)); another way to create backgroud
+    // VDP_setPlaneSize(128,128,TRUE); might need this later
+    VDP_drawImageEx(BG_B, &water, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, bgBaseTileIndex[0]), 0, 0, FALSE, TRUE);
+    VDP_drawImageEx(BG_A, &road, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, bgBaseTileIndex[1]), 0, 0, FALSE, TRUE);
     
-    //background = MAP_create(&bgb_map, BG_B, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USERINDEX)); another way to create backgroud
-    //VDP_setPlaneSize(128,128,TRUE); might need this later
-    VDP_drawImageEx(BG_B, &bga_road, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USERINDEX), 0, 0, FALSE, TRUE);
+    // set scrolling mode
     VDP_setScrollingMode(HSCROLL_PLANE,VSCROLL_PLANE);
     
-    //// Allocate memory for the integer and assign its address to the pointer - done to avpid copying by value to save memory. probably not required but its safe to avoid high ram usage
-    speed = (int*)malloc(sizeof(int));
-    *speed = 1; // now we initialise value of speed by 1
+    // Allocate memory for the level speed and assign its address to the pointer - done to avoid copying by value to save memory. probably not required but its safe to avoid high ram usage
+    levelSpeed = MEM_alloc(sizeof(levelSpeed));
+    *levelSpeed = 7; // now we initialise value of speed to 2
+    
     
     return ind;
-
 }
 
-void start_scroll()
+void startScroll()
 {
-    if(offset <= -256) offset = 0;
+    //reset offset for both planes when limit is reached
+    if(bgbOffset <= -256) bgbOffset = 0;
+    if(bgaOffset <= -256) bgaOffset = 0;
    
-    VDP_setVerticalScroll(BG_B, offset-= *speed );
-    
-    //ignore these - method to use when using map object rather the just drawing image
-    //dir -= 1;
-    //MAP_scrollTo(background, 0, dir);
+    //VDP_setVerticalScroll(BG_B, bgbOffset -= (*speed/waterSpeedDivide));
+    VDP_setVerticalScroll(BG_B, bgbOffset -= 2);
+    VDP_setVerticalScroll(BG_A, bgaOffset -= *levelSpeed);
+}
+
+void checkCollisionWithLevel()
+{
+    s16 player_top_collision_coord_tile = (fix32ToInt(posX) + PLAYER_COLLISION_FROM_TOP) >> 3;
+    s16 player_bottom_collision_coord_tile = (fix32ToInt(posY) + PLAYER_COLLISION_FROM_BOTTOM) >> 3;
+    s16 blocked_coord;
+ 
+    if (player_move_right)
+    {
+        posX += hor_velocity;
+        s16 player_right_collision_coord_tile = (fix32ToInt(posX) + PLAYER_COLLISION_FROM_RIGHT) >> 3;
+
+        u16 array_index_top_right = player_right_collision_coord_tile + (player_top_collision_coord_tile * LEVEL_ARRAY_LENGTH);
+        u8 array_collision_type_top_right = LEVEL_COLLISION[array_index_top_right];
+
+        u16 array_index_bottom_right = player_right_collision_coord_tile +(player_bottom_collision_coord_tile * LEVEL_ARRAY_LENGTH);
+        u8 array_collision_type_bottom_right = LEVEL_COLLISION[array_index_bottom_right];
+
+        if(array_collision_type_top_right == SOLID_TILE || array_collision_type_bottom_right == SOLID_TILE)
+        {
+            blocked_coord = (player_right_collision_coord_tile << 3) -30 - PLAYER_COLLISION_FROM_RIGHT;
+            posX = intToFix32(blocked_coord);
+            posX -= FIX32(0.1);
+            
+            
+        }   
+    }    
+    else if (player_move_left)
+    {
+        posX -= hor_velocity;
+        s16 player_left_collision_coord_tile = (fix32ToInt(posX) + PLAYER_COLLISION_FROM_LEFT) >> 3; 
+
+        u16 array_index_top_left = player_left_collision_coord_tile + (player_top_collision_coord_tile * LEVEL_ARRAY_LENGTH);
+        u8 array_collision_type_top_left = LEVEL_COLLISION[array_index_top_left];
+
+        u16 array_index_bottom_left = player_left_collision_coord_tile + (player_bottom_collision_coord_tile * LEVEL_ARRAY_LENGTH);
+        u8 array_collision_type_bottom_left = LEVEL_COLLISION[array_index_bottom_left];
+
+        if(array_collision_type_top_left == SOLID_TILE || array_collision_type_bottom_left == SOLID_TILE)
+        {
+            blocked_coord = (player_left_collision_coord_tile << 3) + 38 - PLAYER_COLLISION_FROM_LEFT;
+            posX = intToFix32(blocked_coord);
+        }
+    }
+
+    if(player_move_up)
+    {
+        posY -= vert_velocity;
+        s16 player_top_collision_coord_tile = (fix32ToInt(posY) + PLAYER_COLLISION_FROM_TOP) >> 3;
+
+        s16 player_right_collision_coord_tile = (fix32ToInt(posX) + PLAYER_COLLISION_FROM_RIGHT) >> 3;
+        u16 array_index_top_right = player_right_collision_coord_tile + (player_top_collision_coord_tile * LEVEL_ARRAY_LENGTH);
+        u8 array_collision_type_top_right = LEVEL_COLLISION[array_index_top_right];
+
+        s16 player_left_collision_coord_tile = (fix32ToInt(posX) + PLAYER_COLLISION_FROM_LEFT) >> 3;
+        u16 array_index_top_left = player_left_collision_coord_tile + (player_top_collision_coord_tile * LEVEL_ARRAY_LENGTH);
+        u8 array_collision_type_top_left = LEVEL_COLLISION[array_index_top_left];
+
+        if(array_collision_type_top_right == SOLID_TILE || array_collision_type_top_left == SOLID_TILE)
+        {
+            blocked_coord = (player_top_collision_coord_tile << 3) + 8 - PLAYER_COLLISION_FROM_TOP;
+            posY = intToFix32(blocked_coord);
+        }   
+    }
+    else if(player_move_down)
+    {
+        posY += vert_velocity;
+        s16 player_bottom_collision_coord_tile = (fix32ToInt(posY) + PLAYER_COLLISION_FROM_BOTTOM) >> 3;
+
+        s16 player_right_collision_coord_tile = (fix32ToInt(posX) + PLAYER_COLLISION_FROM_RIGHT) >> 3;
+        u16 array_index_bottom_right = player_right_collision_coord_tile +(player_bottom_collision_coord_tile * LEVEL_ARRAY_LENGTH);
+        u8 array_collision_type_bottom_right = LEVEL_COLLISION[array_index_bottom_right];
+
+        s16 player_left_collision_coord_tile = (fix32ToInt(posX) + PLAYER_COLLISION_FROM_LEFT) >> 3; 
+        u16 array_index_bottom_left = player_left_collision_coord_tile + (player_bottom_collision_coord_tile * LEVEL_ARRAY_LENGTH);
+        u8 array_collision_type_bottom_left = LEVEL_COLLISION[array_index_bottom_left];
+
+        if(array_collision_type_bottom_right == SOLID_TILE || array_collision_type_bottom_left == SOLID_TILE)
+        {
+            blocked_coord = (player_bottom_collision_coord_tile << 3) - PLAYER_COLLISION_FROM_BOTTOM;
+            posY = intToFix32(blocked_coord);
+            posY -= FIX32(0.1);
+        }   
+    }
 }
 
 
