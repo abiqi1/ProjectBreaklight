@@ -13,6 +13,8 @@ const u16 LEVEL_ARRAY_LENGTH = 40;
 //fix16* speed;
 //fix16 waterSpeedDivide = FIX16(0.25);
 
+
+//tile map with each index representing a tile on the map, 1 is for solid tile (meaning collision), 0 is for tiles that objects can pass through
 const u8 LEVEL_COLLISION[1280] =
 {
 	0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
@@ -94,31 +96,39 @@ void startScroll()
 }
 
 void checkCollisionWithLevel()
+//this is a mess
 {
+    //we are taking the top and bottom tiles relative to the player position hitbox and then bit shifting by 3 which is the same as dividing by 8 (but less reosurces used). 
+    //we want to divide by 8 because we dont want the pixels but the tiles. 
     s16 player_top_collision_coord_tile = (fix32ToInt(posX) + PLAYER_COLLISION_FROM_TOP) >> 3;
     s16 player_bottom_collision_coord_tile = (fix32ToInt(posY) + PLAYER_COLLISION_FROM_BOTTOM) >> 3;
     s16 blocked_coord;
  
+    //controls collision with level when moving right
     if (player_move_right)
     {
         posX += hor_velocity;
+
+        //same as before taking postion of the right tile from the collision box
         s16 player_right_collision_coord_tile = (fix32ToInt(posX) + PLAYER_COLLISION_FROM_RIGHT) >> 3;
 
+        //now we take the top right tile index by taking the right collision tile + the top collision tile times the level array length (40). This gives us the index for the level collision array map
         u16 array_index_top_right = player_right_collision_coord_tile + (player_top_collision_coord_tile * LEVEL_ARRAY_LENGTH);
         u8 array_collision_type_top_right = LEVEL_COLLISION[array_index_top_right];
 
+        //same as above but for the bottom right
         u16 array_index_bottom_right = player_right_collision_coord_tile +(player_bottom_collision_coord_tile * LEVEL_ARRAY_LENGTH);
         u8 array_collision_type_bottom_right = LEVEL_COLLISION[array_index_bottom_right];
 
+        //now check if player has hit a solid tile (1) in top right and bottom right corners and if so push back the player 
         if(array_collision_type_top_right == SOLID_TILE || array_collision_type_bottom_right == SOLID_TILE)
         {
-            blocked_coord = (player_right_collision_coord_tile << 3) -30 - PLAYER_COLLISION_FROM_RIGHT;
-            posX = intToFix32(blocked_coord);
-            posX -= FIX32(0.1);
-            
-            
+            blocked_coord = (player_right_collision_coord_tile << 3 ) -30 - PLAYER_COLLISION_FROM_RIGHT; // we revert back pixels to move player, extra pusback added to simulate very basic physics
+            posX = intToFix32(blocked_coord); 
+            posX -= FIX32(0.1); // this is added to prevent player getting caught in a tile and flying offscreen
         }   
-    }    
+    } 
+    //same logic applies to the LEFT, UP and DOWN so need for extra comments
     else if (player_move_left)
     {
         posX -= hor_velocity;
@@ -177,10 +187,3 @@ void checkCollisionWithLevel()
         }   
     }
 }
-
-
-
-
-
-
-

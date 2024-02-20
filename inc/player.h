@@ -2,6 +2,7 @@
 #define _PLAYER_H_
 
 
+//these here define the hit box of car sprites in terms of pixels
 #define PLAYER_COLLISION_FROM_LEFT 16
 #define PLAYER_COLLISION_FROM_RIGHT 49
 #define PLAYER_COLLISION_FROM_TOP 0
