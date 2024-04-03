@@ -16,4 +16,5 @@ u16 LEVEL_init(u16 vramIndex);
 void startScroll();
 void checkCollisionWithLevel();
 
+
 #endif // _LEVEL_H_
