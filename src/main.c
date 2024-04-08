@@ -2,10 +2,13 @@
 #include "player.h"
 #include "level.h"
 
+
+
 bool main_game_loop = TRUE;
-u16 ani_timer = 1;
+
 static void handleInput();
 static void check_game_loop();
+static void HandleBackgroundAni();
 
 
 int main()
@@ -21,7 +24,7 @@ int main()
 	
 	while(main_game_loop)
 	{   
-		startScroll();
+		LEVEL_startScroll();
 		handleInput();
 		PLAYER_handleReflectionAnim();
 		SPR_update();
@@ -44,10 +47,8 @@ static void handleInput()
 
 static void check_game_loop()
 {
-	
 	if ( PLAYER_checkHealth(player_health) != TRUE )
 	{
 		main_game_loop = FALSE;
 	}
-	
 }

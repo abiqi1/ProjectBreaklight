@@ -8,7 +8,8 @@
 #define PLAYER_COLLISION_FROM_TOP 0
 #define PLAYER_COLLISION_FROM_BOTTOM 85
 
-
+#define RELFECTION_ANI_DEFAULT 60
+#define RELFECTION_SPEED_DEFAULT 6
 
 
 #define CRUISE_ANI 0
@@ -25,6 +26,8 @@ extern bool player_move_left;
 extern bool player_move_up;
 extern bool player_move_down;
 extern u16* player_health;
+
+
 
 u16 PLAYER_init(u16 vramIndex);
 void PLAYER_handleInput(u16 value);
