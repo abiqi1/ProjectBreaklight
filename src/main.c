@@ -8,7 +8,6 @@ bool main_game_loop = TRUE;
 
 static void handleInput();
 static void check_game_loop();
-static void HandleBackgroundAni();
 
 
 int main()
