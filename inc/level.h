@@ -13,7 +13,9 @@ extern u16* levelSpeed;
 
 
 u16 LEVEL_init(u16 vramIndex);
-void startScroll();
-void checkCollisionWithLevel();
+void LEVEL_startScroll();
+void LEVEL_checkCollisionWithLevel(Sprite* effect);
+void LEVEL_createBackgroundB();
+
 
 #endif // _LEVEL_H_

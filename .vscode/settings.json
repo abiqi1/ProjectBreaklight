@@ -4,7 +4,9 @@
         "font.h": "c",
         "vdp_tile.h": "c",
         "resources.h": "c",
-        "level.h": "c"
+        "level.h": "c",
+        "player.h": "c",
+        "timer.h": "c"
     },
     "cmake.configureOnOpen": false
 }
