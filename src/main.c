@@ -13,7 +13,7 @@ static void check_game_loop();
 int main()
 {	
 	u16 ind;
-	ind = TILE_USERINDEX;
+	ind = TILE_USER_INDEX;
 
 	SPR_init();
 	ind += LEVEL_init(ind);

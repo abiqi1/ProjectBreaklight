@@ -74,7 +74,7 @@ void PLAYER_handleInput(u16 value)
         if(value & BUTTON_RIGHT)
         {   
             SPR_setAnim(reflection, 2);
-            SPR_setAnim(sparks, 2);
+            SPR_setAnim(sparks, 5);
             SPR_setFrame(player, 2);
             SPR_setVisibility(sparks,  HIDDEN );
             player_move_right = TRUE;
@@ -83,7 +83,7 @@ void PLAYER_handleInput(u16 value)
         else if (value & BUTTON_LEFT)
         {   
             SPR_setAnim(reflection, 1);
-            SPR_setAnim(sparks, 1);
+            SPR_setAnim(sparks, 4);
             SPR_setFrame(player, 1);
             SPR_setVisibility(sparks,  HIDDEN );
             player_move_right = FALSE;
