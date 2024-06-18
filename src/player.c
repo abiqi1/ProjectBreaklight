@@ -56,6 +56,16 @@ bool PLAYER_checkHealth(u16* player_health)
     }
 }
 
+void PLAYER_manageHealth(u16* graceperiod)
+{
+    if(*graceperiod == 0)
+    {
+        *player_health--;
+        *graceperiod = 300;
+
+    }
+}
+
 void PLAYER_handleReflectionAnim()
 {
     relection_ani_counter--;

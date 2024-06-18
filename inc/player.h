@@ -33,6 +33,7 @@ u16 PLAYER_init(u16 vramIndex);
 void PLAYER_handleInput(u16 value);
 bool PLAYER_checkHealth(u16* player_health);
 void PLAYER_handleReflectionAnim();
+void PLAYER_manageHealth(u16* graceperiod);
 
 
 #endif // _PLAYER_H_
