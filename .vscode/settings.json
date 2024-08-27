@@ -6,7 +6,10 @@
         "resources.h": "c",
         "level.h": "c",
         "player.h": "c",
-        "timer.h": "c"
+        "timer.h": "c",
+        "obstacles.h": "c",
+        "vdp.h": "c",
+        "title.h": "c"
     },
     "cmake.configureOnOpen": false
 }

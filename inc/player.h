@@ -1,6 +1,7 @@
 #ifndef _PLAYER_H_
 #define _PLAYER_H_
 
+#include "obstacles.h"
 
 //these here define the hit box of car sprites in terms of pixels
 #define PLAYER_COLLISION_FROM_LEFT 16
@@ -33,6 +34,7 @@ u16 PLAYER_init(u16 vramIndex);
 void PLAYER_handleInput(u16 value);
 bool PLAYER_checkHealth(u16* player_health);
 void PLAYER_handleReflectionAnim();
+void PLAYER_manageHealth(u16* graceperiod);
 
 
 #endif // _PLAYER_H_

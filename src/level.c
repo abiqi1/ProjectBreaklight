@@ -1,4 +1,4 @@
-#include "genesis.h"
+#include <genesis.h>
 #include "level.h"
 #include "resources.h"
 #include "player.h"
@@ -73,7 +73,7 @@ u16 LEVEL_init(u16 vramIndex)
     VDP_drawImageEx(BG_A, &road, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, bgBaseTileIndex[1]), 0, 0, FALSE, TRUE);
     
     // set scrolling mode
-    VDP_setScrollingMode(HSCROLL_PLANE,VSCROLL_PLANE);
+    //VDP_setScrollingMode(HSCROLL_PLANE,VSCROLL_PLANE);
     
     // Allocate memory for the level speed and assign its address to the pointer - done to avoid copying by value to save memory. probably not required but its safe to avoid high ram usage
     levelSpeed = MEM_alloc(sizeof(*levelSpeed));
@@ -104,7 +104,7 @@ void LEVEL_startScroll()
     if(bgaOffset <= -256) bgaOffset = 0;
    
     //VDP_setVerticalScroll(BG_B, bgbOffset -= (*speed/waterSpeedDivide));
-    VDP_setVerticalScroll(BG_B, bgbOffset -= 2);
+    VDP_setVerticalScroll(BG_B, bgbOffset -= 1);
     VDP_setVerticalScroll(BG_A, bgaOffset -= *levelSpeed);
 }
 
@@ -139,7 +139,7 @@ void LEVEL_checkCollisionWithLevel(Sprite* effects)
             blocked_coord = (player_right_collision_coord_tile << 3 ) - PLAYER_COLLISION_FROM_RIGHT; // we revert back pixels to move player, extra pusback added to simulate very basic physics
             posX = intToFix32(blocked_coord); 
             posX -= FIX32(0.1); // this is added to prevent player getting caught in a tile and flying offscreen
-            *player_health -= 1; 
+            //*player_health -= 1; 
             SPR_setVisibility(effects,  VISIBLE );
         }        
     } 
@@ -159,7 +159,7 @@ void LEVEL_checkCollisionWithLevel(Sprite* effects)
         {
             blocked_coord = (player_left_collision_coord_tile << 3) + 9 - PLAYER_COLLISION_FROM_LEFT;
             posX = intToFix32(blocked_coord);
-            *player_health -= 1;
+            //*player_health -= 1;
             SPR_setVisibility(effects,  VISIBLE );
         }
     }
