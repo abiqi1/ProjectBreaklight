@@ -73,7 +73,7 @@ u16 LEVEL_init(u16 vramIndex)
     VDP_drawImageEx(BG_A, &road, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, bgBaseTileIndex[1]), 0, 0, FALSE, TRUE);
     
     // set scrolling mode
-    VDP_setScrollingMode(HSCROLL_PLANE,VSCROLL_PLANE);
+    //VDP_setScrollingMode(HSCROLL_PLANE,VSCROLL_PLANE);
     
     // Allocate memory for the level speed and assign its address to the pointer - done to avoid copying by value to save memory. probably not required but its safe to avoid high ram usage
     levelSpeed = MEM_alloc(sizeof(*levelSpeed));

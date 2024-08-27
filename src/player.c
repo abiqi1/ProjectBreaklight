@@ -146,11 +146,13 @@ void PLAYER_handleInput(u16 value)
     {
         SPR_setPosition(reflection, (fix32ToInt(posX) - 4), fix32ToInt(posY)); // this needs to change later so that all car reflections can be adjusted correctly.
         SPR_setPosition(sparks, fix32ToInt(posX), fix32ToInt(posY));
+        //SPR_setPosition(nitroEffect, fix32ToInt(posX), fix32ToInt(posY));
     }
     else if(player_move_right == TRUE)
     {
         SPR_setPosition(reflection, fix32ToInt(posX) + 5, fix32ToInt(posY));
         SPR_setPosition(sparks, fix32ToInt(posX), fix32ToInt(posY));
+        //SPR_setPosition(nitroEffect, fix32ToInt(posX), fix32ToInt(posY));
     }
     else
     {

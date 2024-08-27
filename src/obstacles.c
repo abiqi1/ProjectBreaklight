@@ -1,7 +1,10 @@
+#ifndef EFFECTS_H
+#define EFFECTS_H
+
 #include <genesis.h>
 #include "obstacles.h"
 #include "resources.h"
-#include "player.h"
+
 
 #define Y_COORD_LIMIT 220
 #define Y_SPAWN_COORD -70
@@ -9,8 +12,7 @@
 
 #define PLAYER_OBSTACLE_WIDTH 30
 #define PLAYER_OBSTACLE_LENGTH 55
-#define ITEM_COUNTER_DEFAULT 3600
-
+#define ITEM_COUNTER_DEFAULT 900
 
 
 ObstacleData obsDataList[] = {
@@ -30,19 +32,13 @@ ObstacleData itemDataList[] = {
     { 2,  &items_sheet, PAL3, "nitro",     30, 61 },
 };
 
-
-
 int xSpawnCoords[5] = {50, 88, 128, 168, 207};
 Obstacle obstacleList[20];
-Explosion ExplosionList[5];
+Effect effectList[5];
 int obstacleListIndex = -1;
-int ExplosionListIndex = -1;
+int effectListIndex = -1;
 u16 spawn_counter = SPAWN_RATE;
-int explosion_delete_counter = 30;
-
-// u16* heartCounter;
-// u16* armourCounter;
-// u16* nitroCounter;
+int effect_delete_counter = 30;
 
 int* itemCounter;
 
@@ -52,7 +48,6 @@ int* itemCounter;
 
 void OBSTACLES_counterInit()
 {
-
     itemCounter = MEM_alloc(sizeof(*itemCounter));
     *itemCounter = ITEM_COUNTER_DEFAULT;
 }
@@ -61,7 +56,6 @@ u16 OBSTACLES_generator(u16 vramIndex)
 {   
     spawn_counter--;
     --*itemCounter;
-
 
     if(spawn_counter == 0)
     {
@@ -72,13 +66,41 @@ u16 OBSTACLES_generator(u16 vramIndex)
     return vramIndex;
 }
 
+void updateEffects(Effect e) 
+{
+    effectListIndex++;
+    effectList[effectListIndex] = e;
+}
+
+void deleteEffect() 
+{
+    Effect* e;
+    for (int i = 0; i <= effectListIndex; i++) 
+    {
+        e = &effectList[i];
+
+        if (e->timer > 0) 
+        {
+            e->timer--;
+        } 
+        else 
+        {
+            SPR_releaseSprite(e->o);
+            for(int j = i; j <= effectListIndex; j++)
+            {
+                effectList[j] = effectList[j + 1];
+            }
+            effectListIndex--;
+            i--; 
+        }
+    }
+}
 
 void OBSTACLES_handleMovement()
 {   
     Obstacle* o;
     for(int i = 0; i <=obstacleListIndex; i++ )
     {
-
         o = &obstacleList[i];
         if(strcmp(o->data->name, "police") == 0)
         {
@@ -94,8 +116,6 @@ void OBSTACLES_handleMovement()
 
 void updateObstaclePosition(Obstacle* o) 
 {
-
-
     if (fix32ToInt(posX) < fix32ToInt(o->obsX)) {
         o->obsX -= FIX32(0.5);
     }
@@ -105,7 +125,6 @@ void updateObstaclePosition(Obstacle* o)
     }
     o->obsY+=FIX32(1);
     SPR_setPosition(o->obs, fix32ToInt(o->obsX), fix32ToInt(o->obsY));
-
 }
 
 void OBSTACLES_deleteFromList()
@@ -116,22 +135,15 @@ void OBSTACLES_deleteFromList()
         o = &obstacleList[i];
         if(fix32ToInt(o->obsY) > Y_COORD_LIMIT)
         {
-            SPR_releaseSprite(o->obs);
-            for(int j = i; j <= obstacleListIndex; j++)
-            {
-                obstacleList[j] = obstacleList[j + 1];
-            }
-            obstacleListIndex--;
-            i--; // Adjust loop counter since we removed an element
+            releaseSprite(o, i);
         }
     }
-    DeleteExplosions();
+    deleteEffect();
 }
 
 void OBSTACLES_handleCollision(u16* graceperiod)
 {
-
-    explosion_delete_counter--;
+    effect_delete_counter--;
     Obstacle* o;
     for(int i = 0; i <= obstacleListIndex; i++)
     {
@@ -149,53 +161,67 @@ void OBSTACLES_handleCollision(u16* graceperiod)
            fix32ToInt(posY) + PLAYER_OBSTACLE_LENGTH > fix32ToInt(o->obsY)
         )
         {
-            //PLAYER_manageHealth(graceperiod);
-            Sprite* explosion = SPR_addSprite(&effects_sheet, fix32ToInt(o->obsX), fix32ToInt(o->obsY), TILE_ATTR(PAL3, FALSE, FALSE, FALSE));
-            SPR_setAnim(explosion, 7);
-
-            SPR_releaseSprite(o->obs);
-            for(int j = i; j <= obstacleListIndex; j++)
+            if(strcmp(o->data->name, "armour") == 0)
             {
-                obstacleList[j] = obstacleList[j + 1];
+                Sprite* armourEffect = SPR_addSprite(&effects_sheet, fix32ToInt(o->obsX), fix32ToInt(o->obsY), TILE_ATTR(PAL3, FALSE, FALSE, FALSE));
+                SPR_setAnim(armourEffect, 1);
+                releaseSprite(o, i);
+                Effect e = {armourEffect, 30};
+                updateEffects(e);
             }
-            obstacleListIndex--;
-            i--; 
+            else if(strcmp(o->data->name, "heart") == 0)
+            {
+                Sprite* heartEffect = SPR_addSprite(&effects_sheet, fix32ToInt(o->obsX), fix32ToInt(o->obsY), TILE_ATTR(PAL3, FALSE, FALSE, FALSE));
+                SPR_setAnim(heartEffect, 0);
+                releaseSprite(o, i);
+                Effect e = {heartEffect, 30};
+                updateEffects(e);
+            }
+            else if(strcmp(o->data->name, "nitro") == 0)
+            {   
+                Sprite* nitroEffect = SPR_addSprite(&effects_sheet, fix32ToInt(posX), fix32ToInt(posY), TILE_ATTR(PAL3, FALSE, FALSE, FALSE));
+                SPR_setAnim(nitroEffect, 3);
+                SPR_setAlwaysOnTop(nitroEffect);
+                releaseSprite(o, i);
+                Effect e = {nitroEffect, 30};
+                updateEffects(e);
+            }
+            // else if(strcmp(o->data->name, "oil"))
+            // {
 
-            Explosion boom = {explosion, 30};
-            updateExplosions(boom);
-            //SPR_releaseSprite(explosion);// Adjust loop counter since we removed an element
+            // }
+            // else if(strcmp(o->data->name, "barrier"))
+            // {
+
+            // }
+            else
+            {
+                //PLAYER_manageHealth(graceperiod);
+                Sprite* explosion = SPR_addSprite(&effects_sheet, fix32ToInt(o->obsX), fix32ToInt(o->obsY), TILE_ATTR(PAL3, FALSE, FALSE, FALSE));
+                SPR_setAnim(explosion, 7);
+                SPR_setAlwaysOnTop(explosion);
+                releaseSprite(o, i);
+       
+
+                Effect e = {explosion, 30};
+                updateEffects(e);
+                //SPR_releaseSprite(explosion);// Adjust loop counter since we removed an element
+            }
         }
     }
 }
 
-void updateExplosions(Explosion boom) 
-{
-    ExplosionListIndex++;
-    ExplosionList[ExplosionListIndex] = boom;
-}
 
-void DeleteExplosions() 
+
+void releaseSprite(Obstacle* o, int i)
 {
-    Explosion* boom;
-    for (int i = 0; i <= ExplosionListIndex; i++) 
+    SPR_releaseSprite(o->obs);
+    for(int j = i; j <= obstacleListIndex; j++)
     {
-        boom = &ExplosionList[i];
-
-        if (boom->timer > 0) 
-        {
-            boom->timer--;
-        } 
-        else 
-        {
-            SPR_releaseSprite(boom->o);
-            for(int j = i; j <= ExplosionListIndex; j++)
-            {
-                ExplosionList[j] = ExplosionList[j + 1];
-            }
-            ExplosionListIndex--;
-            i--; 
-        }
+        obstacleList[j] = obstacleList[j + 1];
     }
+    obstacleListIndex--;
+    i--; // Adjust loop counter since we removed an element
 }
 
 void pickRandObj()
@@ -238,3 +264,5 @@ bool check_item_counter()
     } 
     return status;
 }
+
+#endif // EFFECTS_H

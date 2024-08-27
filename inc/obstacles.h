@@ -1,12 +1,14 @@
 #ifndef _OBSTACLES_H_
 #define _OBSTACLES_H_
 
-typedef struct Explosion
+#include "player.h"
+
+typedef struct Effect
 {
     Sprite* o;
     u16 timer;
 
-} Explosion;
+} Effect;
 
 
 typedef struct ObstacleData 
@@ -30,14 +32,18 @@ typedef struct Obstacle
 
 } Obstacle;
 
+Sprite* nitroEffect;
+Sprite* heartEffect;
+Sprite* armourEffect;
 
 u16 OBSTACLES_generator(u16 vramIndex);
 extern void OBSTACLES_handleMovement();
 extern void OBSTACLES_counterInit();
 void OBSTACLES_deleteFromList();
 void OBSTACLES_handleCollision(u16* graceperiod);
-void updateExplosions(Explosion o);
-void DeleteExplosions();
+void updateEffects(Effect e);
+void deleteEffect();
+void releaseSprite(Obstacle* o, int i);
 void updateObstaclePosition(Obstacle* o);
 bool check_item_counter();
 void pickRandObj();

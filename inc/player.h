@@ -1,6 +1,7 @@
 #ifndef _PLAYER_H_
 #define _PLAYER_H_
 
+#include "obstacles.h"
 
 //these here define the hit box of car sprites in terms of pixels
 #define PLAYER_COLLISION_FROM_LEFT 16
